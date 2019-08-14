@@ -1995,7 +1995,7 @@ __webpack_require__.r(__webpack_exports__);
     getAnswerButtonClass: function getAnswerButtonClass(answer) {
       return {
         'btn-outline-primary': answer !== this.selectedAnswer,
-        'btn-outline-success': answer === this.selectedAnswer
+        'btn-primary': answer === this.selectedAnswer
       };
     },
     getNextQuestion: function getNextQuestion() {
