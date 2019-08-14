@@ -1,0 +1,11 @@
+.required-field::after {
+    content: "*";
+    color: #000000;
+}
+
+.footer {
+    position: fixed;
+    height: 100px;
+    bottom: 0;
+    width: 100%;
+}
