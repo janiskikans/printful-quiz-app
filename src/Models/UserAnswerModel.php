@@ -9,13 +9,11 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * Class UserAnswerModel
  * @package Quiz\Models
  * @property int $id
- * @property int $user_id
- * @property int $quiz_id
+ * @property int $attempt_id
  * @property int $question_id
  * @property int $answer_id
  *
- * @property UserModel $user
- * @property QuizModel $quiz
+ * @property AttemptModel $attempt
  * @property QuestionModel $question
  * @property AnswerModel $answer
  */
@@ -27,23 +25,15 @@ class UserAnswerModel extends BaseModel
      */
     public $table = 'user_answers';
 
-    /** @var array  */
+    /** @var array */
     public $guarded = [];
 
     /**
      * @return HasOne
      */
-    public function user(): HasOne
+    public function attempt()
     {
-        return $this->hasOne(UserModel::class, 'id', 'user_id');
-    }
-
-    /**
-     * @return HasOne
-     */
-    public function quiz(): HasOne
-    {
-        return $this->hasOne(QuizModel::class, 'id', 'quiz_id');
+        return $this->hasOne(AttemptModel::class, 'id', 'attempt_id');
     }
 
     /**

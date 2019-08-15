@@ -7,10 +7,10 @@
                     @quiz-started="onQuizStarted">
         </quiz-start>
 
-        <quiz-questions :current-question="currentQuestion" v-else-if="currentStep === 2">
+        <quiz-questions :current-quiz="currentQuiz" :result="result" :current-question="currentQuestion" @results-received="onResultsReceived" v-else-if="currentStep === 2">
         </quiz-questions>
 
-        <quiz-results v-else-if="currentStep === 3">
+        <quiz-results :current-quiz="currentQuiz" :result="result" v-else-if="currentStep === 3" @quiz-finished="onQuizFinished">
         </quiz-results>
 
         <div v-else class="container" style="height:70vh;">
@@ -40,7 +40,7 @@
         components: {
             'quiz-start': QuizStartComponent,
             'quiz-questions': QuizQuestionsComponent,
-            'quiz-results': QuizResultsComponent
+            'quiz-results': QuizResultsComponent,
         },
 
         props: {
@@ -69,10 +69,13 @@
                 currentStep: 1,
 
                 /** @type {?Number} */
-                currentQuizId: null,
+                currentQuiz: null,
 
                 /** @type {?Number} */
                 currentQuestion: null,
+
+                /** @type {?Result} */
+                result: null,
             }
         },
 
@@ -81,11 +84,35 @@
              * @param {{quizId: number, firstQuestion Question}} emittedData
              */
             onQuizStarted(emittedData) {
-                this.currentQuizId = emittedData.quizId;
+                let quizId = emittedData.quizId;
+
+                this.currentQuiz = this.quizzes.find((quiz) => {
+                    return quiz.id === quizId;
+                });
+
                 this.currentQuestion = emittedData.firstQuestion;
 
                 this.currentStep++;
-            }
+            },
+
+            /**
+             *
+             * @param {Result} emittedResult
+             */
+            onResultsReceived(emittedResult) {
+                this.result = emittedResult;
+
+                this.currentStep++;
+
+                this.currentQuestion = null;
+            },
+
+            onQuizFinished() {
+                this.currentStep = 1;
+
+                this.currentQuiz = null;
+                this.result = null;
+            },
         }
     }
 </script>

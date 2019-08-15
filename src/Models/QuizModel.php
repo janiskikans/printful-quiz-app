@@ -12,7 +12,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property string $title
  *
  * @property QuestionModel[] $questions
- * @property UserAnswerModel[] $userAnswers
+ * @property AttemptModel[] $attempts
  */
 class QuizModel extends BaseModel
 {
@@ -33,9 +33,9 @@ class QuizModel extends BaseModel
     /**
      * @return HasMany
      */
-    public function userAnswers(): HasMany
+    public function attempts(): HasMany
     {
-        return $this->hasMany(UserAnswerModel::class, 'quiz_id', 'id');
+        return $this->hasMany(AttemptModel::class, 'quiz_id', 'id');
     }
 }
 

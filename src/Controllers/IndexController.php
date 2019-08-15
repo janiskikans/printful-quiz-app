@@ -38,4 +38,5 @@ class IndexController extends BaseController
     {
         return $this->view('about');
     }
+
 }

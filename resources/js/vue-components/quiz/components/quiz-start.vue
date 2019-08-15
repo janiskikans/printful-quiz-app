@@ -14,8 +14,10 @@
                         <select class="custom-select" v-model="selectedQuizId">
                             <option value="-1">Please select a Quiz..</option>
 
-                            <option :value="quiz.id" v-for="quiz in quizzes">
-                                {{ quiz.title }}
+                            <option :value="quiz.id" v-for="(quiz, index) in quizzes">
+                                {{ quiz.title }} (~{{ calculateEstimateCompletionTime(index) }}
+                                <span v-if="calculateEstimateCompletionTime(index) > 1">minutes</span>
+                                <span v-else>minute</span>)
                             </option>
                         </select>
 
@@ -88,7 +90,11 @@
                 }).then((response) => {
                     console.log(response);
                 });*/
-            }
+            },
+
+            calculateEstimateCompletionTime($quizIndex) {
+                return this.quizzes[$quizIndex].questionCount * 0.5;
+            },
         },
 
         computed: {

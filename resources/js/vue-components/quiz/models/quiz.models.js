@@ -6,6 +6,9 @@ class Quiz {
 
         /** @type {string} */
         this.title = '';
+
+        /** @type {Number} */
+        this.questionCount = 0;
     }
 
     static fromArray(rawData) {
@@ -13,6 +16,7 @@ class Quiz {
 
         quiz.id = rawData.id;
         quiz.title = rawData.title;
+        quiz.questionCount = rawData.questionCount;
 
         return quiz;
     }
@@ -66,4 +70,26 @@ class Answer {
     }
 }
 
-export {Quiz, Question, Answer}
+class Result {
+
+    constructor() {
+        /** @type {?int} */
+        this.correctAnswerCount = 0;
+        // this.correctQuestionList = [];
+        // this.incorrectQuestionList = [];
+        this.answeredQuestionList = [];
+    }
+
+    static fromArray(rawData) {
+        let result = new Result();
+
+        result.correctAnswerCount = rawData.correctAnswerCount;
+        // result.correctQuestionList = rawData.correctQuestionList;
+        // result.incorrectQuestionList = rawData.incorrectQuestionList;
+        result.answeredQuestionList = rawData.answeredQuestionList;
+
+        return result;
+    }
+}
+
+export {Quiz, Question, Answer, Result}

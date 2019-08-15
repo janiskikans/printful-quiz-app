@@ -13,7 +13,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property string $email
  * @property string $password
  *
- * @property UserAnswerModel[] $userAnswers
+ * @property AttemptModel[] $attempts
  */
 class UserModel extends BaseModel
 {
@@ -31,9 +31,9 @@ class UserModel extends BaseModel
     /**
      * @return HasMany
      */
-    public function userAnswers(): HasMany
+    public function attempts()
     {
-        return $this->hasMany(UserAnswerModel::class, 'user_id', 'id');
+        return $this->hasMany(AttemptModel::class, 'user_id', 'id');
     }
 
     /**

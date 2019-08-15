@@ -3,11 +3,12 @@
 
 namespace Quiz\Services;
 
-
+use Quiz\Exceptions\QuizException;
 use Quiz\Models\AnswerModel;
 use Quiz\Models\QuestionModel;
 use Quiz\Models\QuizModel;
 use Quiz\Repositories\AnswerRepository;
+use Quiz\Repositories\AttemptRepository;
 use Quiz\Repositories\QuestionRepository;
 use Quiz\Repositories\QuizRepository;
 use Quiz\Repositories\UserAnswerRepository;
@@ -17,7 +18,7 @@ use Quiz\Session;
 class QuizService
 {
     /** @var string */
-    private const SESSION_KEY_CURRENT_QUIZ_ID = 'currentQuizId';
+    private const SESSION_KEY_CURRENT_ATTEMPT_ID = 'currentAttemptId';
 
     /** @var string */
     private const SESSION_KEY_QUESTIONS_ANSWERED = 'questionsAnswered';
@@ -40,11 +41,15 @@ class QuizService
     /** @var UserAnswerRepository */
     private $userAnswerRepository;
 
+    /** @var AttemptRepository */
+    private $attemptRepository;
+
     public function __construct(
         ?QuizRepository $repository = null,
         QuestionRepository $questionRepository = null,
         AnswerRepository $answerRepository = null,
         UserAnswerRepository $userAnswerRepository = null,
+        AttemptRepository $attemptRepository = null,
         UserRepository $userRepository = null,
         Session $session = null
     ) {
@@ -54,6 +59,7 @@ class QuizService
         $this->session = $session ?? Session::getInstance();
         $this->answerRepository = $answerRepository ?? new AnswerRepository();
         $this->userAnswerRepository = $userAnswerRepository ?? new UserAnswerRepository();
+        $this->attemptRepository = $attemptRepository ?? new AttemptRepository();
     }
 
     /**
@@ -67,9 +73,12 @@ class QuizService
         $quizData = [];
 
         foreach ($quizzes as $quiz) {
+            $questionCount = $this->questionRepository->count(['quiz_id' => $quiz->id]);
+
             $quizData[] = [
                 'id' => $quiz->id,
                 'title' => $quiz->title,
+                'questionCount' => $questionCount,
             ];
         }
 
@@ -87,12 +96,17 @@ class QuizService
         $userExists = $this->userRepository->userExists(['id' => $userId]);
 
         if ( ! $userExists) {
-            throw new \Exception('Something went wrong! User was not found.');
+            throw new QuizException('Something went wrong! User was not found.');
         }
 
         $quiz = $this->getQuizById($quizId);
 
-        $this->session->set(self::SESSION_KEY_CURRENT_QUIZ_ID, $quizId);
+        $attempt = $this->attemptRepository->create([
+            'user_id' => $userId,
+            'quiz_id' => $quizId
+        ]);
+
+        $this->session->set(self::SESSION_KEY_CURRENT_ATTEMPT_ID, $attempt->id);
         $this->session->set(self::SESSION_KEY_QUESTIONS_ANSWERED, 0);
 
         return $quiz;
@@ -135,17 +149,17 @@ class QuizService
      */
     public function getNextQuestion()
     {
-        $quizId = $this->session->get(self::SESSION_KEY_CURRENT_QUIZ_ID);
+        $attemptId = $this->session->get(self::SESSION_KEY_CURRENT_ATTEMPT_ID);
 
-        $quiz = $this->getQuizById($quizId);
+        $attempt = $this->getAttemptById($attemptId);
 
         $questionsAnswered = $this->session->get(self::SESSION_KEY_QUESTIONS_ANSWERED, -1);
 
         if ($questionsAnswered < 0) {
-            throw new \Exception('Questions answered not set');
+            throw new QuizException('Questions answered not set');
         }
 
-        $question = $this->questionRepository->getQuestionByQuizIdAndOffset($quiz->id, $questionsAnswered);
+        $question = $this->questionRepository->getQuestionByQuizIdAndOffset($attempt->quiz_id, $questionsAnswered);
 
         return $question;
     }
@@ -160,7 +174,7 @@ class QuizService
         $quiz = $this->repository->one(['id' => $quizId]);
 
         if ( ! $quiz) {
-            throw new \Exception("Could not find quiz with id #$quizId");
+            throw new QuizException("Could not find quiz with id #$quizId");
         }
         return $quiz;
     }
@@ -170,17 +184,17 @@ class QuizService
         $answer = $this->answerRepository->one(['id' => $answerId]);
 
         if ( ! $answer) {
-            throw new \Exception("Could not find answer with id #$answerId");
+            throw new QuizException("Could not find answer with id #$answerId");
         }
 
-        $currentQuizId = $this->session->get(self::SESSION_KEY_CURRENT_QUIZ_ID);
-        $userId = $this->session->getLoggedInUserId();
+        $currentAttemptId = $this->session->get(self::SESSION_KEY_CURRENT_ATTEMPT_ID);
+
+        $attempt = $this->getAttemptById($currentAttemptId);
 
         $this->userAnswerRepository->create([
-            'quiz_id' => $currentQuizId,
+            'attempt_id' => $attempt->id,
             'question_id' => $answer->question_id,
             'answer_id' => $answer->id,
-            'user_id' => $userId,
         ]);
 
         $questionsAnswered = $this->session->get(self::SESSION_KEY_QUESTIONS_ANSWERED);
@@ -188,4 +202,50 @@ class QuizService
         $this->session->set(self::SESSION_KEY_QUESTIONS_ANSWERED, $questionsAnswered);
     }
 
+    /**
+     * @return array
+     * @throws \Exception
+     */
+    public function getResultData()
+    {
+        $currentAttemptId = $this->session->get(self::SESSION_KEY_CURRENT_ATTEMPT_ID);
+        $attempt = $this->getAttemptById($currentAttemptId);
+
+        $correctAnswerCount = 0;
+        $answeredQuestionList = array();
+
+        foreach ($attempt->userAnswers as $userAnswer) {
+            $correctAnswerCount += $userAnswer->answer->is_correct;
+
+            $answeredQuestionList[$userAnswer->answer->id] = [
+                'questionText' => $userAnswer->question->text,
+                'answeredCorrectly' => $userAnswer->answer->is_correct
+            ];
+
+        }
+
+
+        $this->session->delete(self::SESSION_KEY_CURRENT_ATTEMPT_ID);
+        $this->session->delete(self::SESSION_KEY_QUESTIONS_ANSWERED);
+
+        return [
+            'correctAnswerCount' => $correctAnswerCount,
+            'answeredQuestionList' => $answeredQuestionList
+        ];
+    }
+
+    /**
+     * @param $attemptId
+     * @return \Quiz\Models\AttemptModel|null
+     * @throws \Exception
+     */
+    public function getAttemptById($attemptId)
+    {
+        $attempt = $this->attemptRepository->one(['id' => $attemptId]);
+
+        if ( ! $attempt) {
+            throw new QuizException('Quiz has not been started!');
+        }
+        return $attempt;
+    }
 }

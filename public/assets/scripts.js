@@ -1907,10 +1907,13 @@ __webpack_require__.r(__webpack_exports__);
       currentStep: 1,
 
       /** @type {?Number} */
-      currentQuizId: null,
+      currentQuiz: null,
 
       /** @type {?Number} */
-      currentQuestion: null
+      currentQuestion: null,
+
+      /** @type {?Result} */
+      result: null
     };
   },
   methods: {
@@ -1918,9 +1921,27 @@ __webpack_require__.r(__webpack_exports__);
      * @param {{quizId: number, firstQuestion Question}} emittedData
      */
     onQuizStarted: function onQuizStarted(emittedData) {
-      this.currentQuizId = emittedData.quizId;
+      var quizId = emittedData.quizId;
+      this.currentQuiz = this.quizzes.find(function (quiz) {
+        return quiz.id === quizId;
+      });
       this.currentQuestion = emittedData.firstQuestion;
       this.currentStep++;
+    },
+
+    /**
+     *
+     * @param {Result} emittedResult
+     */
+    onResultsReceived: function onResultsReceived(emittedResult) {
+      this.result = emittedResult;
+      this.currentStep++;
+      this.currentQuestion = null;
+    },
+    onQuizFinished: function onQuizFinished() {
+      this.currentStep = 1;
+      this.currentQuiz = null;
+      this.result = null;
     }
   }
 });
@@ -1972,6 +1993,17 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 
 /* harmony default export */ __webpack_exports__["default"] = ({
@@ -1979,13 +2011,27 @@ __webpack_require__.r(__webpack_exports__);
     /** @type {Question} */
     currentQuestion: {
       required: true
+    },
+
+    /** @type {Result} */
+    result: {
+      required: true
+    },
+
+    /**
+     * @type {Quiz}
+     */
+    currentQuiz: {
+      required: true
     }
   },
   data: function data() {
     return {
       /** @type {?Answer} */
       selectedAnswer: null,
-      loading: false
+      loading: false,
+      error: '',
+      currentQuestionNumber: 1
     };
   },
   methods: {
@@ -1998,6 +2044,9 @@ __webpack_require__.r(__webpack_exports__);
         'btn-primary': answer === this.selectedAnswer
       };
     },
+    getProgressPercentage: function getProgressPercentage() {
+      return (this.currentQuestionNumber - 1) / this.currentQuiz.questionCount * 100;
+    },
     getNextQuestion: function getNextQuestion() {
       var _this = this;
 
@@ -2008,9 +2057,32 @@ __webpack_require__.r(__webpack_exports__);
       var data = new FormData();
       data.append('answerId', this.selectedAnswer.id);
       this.loading = true;
-      axios__WEBPACK_IMPORTED_MODULE_0___default.a.post('/quiz/next-question', data).then(function (response) {})["finally"](function () {
+      axios__WEBPACK_IMPORTED_MODULE_0___default.a.post('/quiz/next-question', data).then(function (response) {
+        if (response.data.error) {
+          _this.error = response.data.error;
+          return;
+        }
+
+        if (response.data.resultData) {
+          _this.onResultsReceived(response.data.resultData);
+
+          _this.currentQuestionNumber = 0;
+          return;
+        }
+
+        _this.selectedAnswer = null;
+        var nextQuestion = _models_quiz_models__WEBPACK_IMPORTED_MODULE_1__["Question"].fromArray(response.data.questionData);
+        _this.currentQuestion.id = nextQuestion.id;
+        _this.currentQuestion.text = nextQuestion.text;
+        _this.currentQuestion.answers = nextQuestion.answers;
+        _this.currentQuestionNumber++;
+      })["finally"](function () {
         _this.loading = false;
       });
+    },
+    onResultsReceived: function onResultsReceived(resultData) {
+      var result = _models_quiz_models__WEBPACK_IMPORTED_MODULE_1__["Result"].fromArray(resultData);
+      this.$emit('results-received', result);
     }
   },
   computed: {
@@ -2046,7 +2118,67 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-/* harmony default export */ __webpack_exports__["default"] = ({});
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+/* harmony default export */ __webpack_exports__["default"] = ({
+  props: {
+    /**
+     * @type {Quiz}
+     */
+    currentQuiz: {
+      required: true
+    },
+
+    /**
+     * @type {Result}
+     */
+    result: {
+      required: true
+    }
+  },
+  data: function data() {
+    return {
+      questionCounter: 0
+    };
+  },
+  methods: {
+    endQuiz: function endQuiz() {
+      this.$emit('quiz-finished');
+    },
+    getCorrectQuestionClass: function getCorrectQuestionClass(question) {
+      return {
+        'border-success': question.answeredCorrectly === 1,
+        'border-primary': question.answeredCorrectly === 0
+      };
+    },
+    getPerformancePercentage: function getPerformancePercentage() {
+      var correctAnswerCount = this.result.correctAnswerCount;
+      var totalQuestionCount = this.currentQuiz.questionCount;
+      return (correctAnswerCount / totalQuestionCount * 100).toFixed();
+    }
+  }
+});
 
 /***/ }),
 
@@ -2062,6 +2194,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! axios */ "./node_modules/axios/index.js");
 /* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(axios__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _models_quiz_models_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../models/quiz.models.js */ "./resources/js/vue-components/quiz/models/quiz.models.js");
+//
+//
 //
 //
 //
@@ -2145,6 +2279,9 @@ __webpack_require__.r(__webpack_exports__);
       }).then((response) => {
           console.log(response);
       });*/
+    },
+    calculateEstimateCompletionTime: function calculateEstimateCompletionTime($quizIndex) {
+      return this.quizzes[$quizIndex].questionCount * 0.5;
     }
   },
   computed: {
@@ -2672,10 +2809,18 @@ var render = function() {
           })
         : _vm.currentStep === 2
         ? _c("quiz-questions", {
-            attrs: { "current-question": _vm.currentQuestion }
+            attrs: {
+              "current-quiz": _vm.currentQuiz,
+              result: _vm.result,
+              "current-question": _vm.currentQuestion
+            },
+            on: { "results-received": _vm.onResultsReceived }
           })
         : _vm.currentStep === 3
-        ? _c("quiz-results")
+        ? _c("quiz-results", {
+            attrs: { "current-quiz": _vm.currentQuiz, result: _vm.result },
+            on: { "quiz-finished": _vm.onQuizFinished }
+          })
         : _c(
             "div",
             { staticClass: "container", staticStyle: { height: "70vh" } },
@@ -2750,9 +2895,45 @@ var render = function() {
           _c("div", { staticClass: "col-12" }, [
             _c("div", { staticClass: "card bg-secondary" }, [
               _c("div", { staticClass: "card-body" }, [
+                _vm.error.length
+                  ? _c("div", { staticClass: "alert alert-danger" }, [
+                      _vm._v(
+                        "\n                        " +
+                          _vm._s(_vm.error) +
+                          "\n                    "
+                      )
+                    ])
+                  : _vm._e(),
+                _vm._v(" "),
+                _c("p", [
+                  _vm._v(
+                    "Question " +
+                      _vm._s(_vm.currentQuestionNumber) +
+                      " out of " +
+                      _vm._s(_vm.currentQuiz.questionCount)
+                  )
+                ]),
+                _vm._v(" "),
+                _c("div", { staticClass: "progress mb-3" }, [
+                  _c("div", {
+                    staticClass: "progress-bar",
+                    style: { width: _vm.getProgressPercentage() + "%" },
+                    attrs: {
+                      role: "progressbar",
+                      "aria-valuenow": "25",
+                      "aria-valuemin": "0",
+                      "aria-valuemax": _vm.currentQuiz.questionCount
+                    }
+                  })
+                ]),
+                _vm._v(" "),
                 _c("div", { staticClass: "pl-1" }, [
                   _c("h2", { staticClass: "pb-1" }, [
-                    _vm._v(_vm._s(_vm.currentQuestion.text))
+                    _vm._v(
+                      _vm._s(_vm.currentQuestionNumber) +
+                        ". " +
+                        _vm._s(_vm.currentQuestion.text)
+                    )
                   ]),
                   _vm._v(" "),
                   _c("p", [
@@ -2840,36 +3021,105 @@ var render = function() {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _vm._m(0)
-}
-var staticRenderFns = [
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c(
-      "div",
-      { staticClass: "container", staticStyle: { height: "70vh" } },
-      [
-        _c(
-          "div",
-          {
-            staticClass: "row h-100 justify-content-center align-items-center"
-          },
-          [
-            _c("div", { staticClass: "col-12" }, [
-              _c("div", { staticClass: "card bg-secondary" }, [
-                _c("div", { staticClass: "card-body" }, [
-                  _c("h1", { staticClass: "pb-1" }, [_vm._v("Quiz Results")])
-                ])
-              ])
+  return _c(
+    "div",
+    { staticClass: "container", staticStyle: { height: "70vh" } },
+    [
+      _c(
+        "div",
+        { staticClass: "row h-100 justify-content-center align-items-center" },
+        [
+          _c("div", { staticClass: "col-12" }, [
+            _c("div", { staticClass: "card bg-secondary" }, [
+              _c(
+                "div",
+                { staticClass: "card-body" },
+                [
+                  _c("h1", { staticClass: "pb-2" }, [_vm._v("Quiz Results")]),
+                  _vm._v(" "),
+                  _c("p", { staticClass: "mb-3 h5" }, [
+                    _c("strong", [
+                      _vm.result.correctAnswerCount > 0
+                        ? _c("span", [_vm._v("Congratulations! ")])
+                        : _c("span", [_vm._v("Oops! ")])
+                    ]),
+                    _vm._v(" You have answered correctly to "),
+                    _c("strong", [
+                      _vm._v(
+                        _vm._s(_vm.result.correctAnswerCount) +
+                          " out of\n                        " +
+                          _vm._s(_vm.currentQuiz.questionCount)
+                      )
+                    ]),
+                    _vm._v(
+                      " questions! Check how you did below. When finished return to the start."
+                    )
+                  ]),
+                  _vm._v(" "),
+                  _c("h4", { staticClass: "mb-3" }, [
+                    _vm._v(
+                      "Your Performance (" +
+                        _vm._s(_vm.getPerformancePercentage()) +
+                        "% correct)"
+                    )
+                  ]),
+                  _vm._v(" "),
+                  _vm._l(_vm.result.answeredQuestionList, function(
+                    answeredQuestion,
+                    key,
+                    index
+                  ) {
+                    return _c(
+                      "div",
+                      {
+                        key: key,
+                        staticClass: "card mb-3",
+                        class: _vm.getCorrectQuestionClass(answeredQuestion)
+                      },
+                      [
+                        _c("div", { staticClass: "card-header bg-secondary" }, [
+                          _vm._v(
+                            "\n                            " +
+                              _vm._s(index + 1) +
+                              ". " +
+                              _vm._s(answeredQuestion.questionText) +
+                              "\n                            "
+                          ),
+                          answeredQuestion.answeredCorrectly === 1
+                            ? _c(
+                                "span",
+                                { staticClass: "float-right text-success" },
+                                [_vm._v("Correct")]
+                              )
+                            : _c(
+                                "span",
+                                { staticClass: "float-right text-primary" },
+                                [_vm._v("Incorrect")]
+                              )
+                        ])
+                      ]
+                    )
+                  }),
+                  _vm._v(" "),
+                  _c(
+                    "button",
+                    {
+                      staticClass: "btn btn-primary mt-1",
+                      on: { click: _vm.endQuiz }
+                    },
+                    [_vm._v("Return to start")]
+                  )
+                ],
+                2
+              )
             ])
-          ]
-        )
-      ]
-    )
-  }
-]
+          ])
+        ]
+      )
+    ]
+  )
+}
+var staticRenderFns = []
 render._withStripped = true
 
 
@@ -2955,13 +3205,19 @@ var render = function() {
                       _vm._v("Please select a Quiz..")
                     ]),
                     _vm._v(" "),
-                    _vm._l(_vm.quizzes, function(quiz) {
+                    _vm._l(_vm.quizzes, function(quiz, index) {
                       return _c("option", { domProps: { value: quiz.id } }, [
                         _vm._v(
                           "\n                            " +
                             _vm._s(quiz.title) +
-                            "\n                        "
-                        )
+                            " (~" +
+                            _vm._s(_vm.calculateEstimateCompletionTime(index)) +
+                            "\n                            "
+                        ),
+                        _vm.calculateEstimateCompletionTime(index) > 1
+                          ? _c("span", [_vm._v("minutes")])
+                          : _c("span", [_vm._v("minute")]),
+                        _vm._v(")\n                        ")
                       ])
                     })
                   ],
@@ -15395,7 +15651,7 @@ __webpack_require__.r(__webpack_exports__);
 /*!****************************************************************!*\
   !*** ./resources/js/vue-components/quiz/models/quiz.models.js ***!
   \****************************************************************/
-/*! exports provided: Quiz, Question, Answer */
+/*! exports provided: Quiz, Question, Answer, Result */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -15403,6 +15659,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Quiz", function() { return Quiz; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Question", function() { return Question; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Answer", function() { return Answer; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Result", function() { return Result; });
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
@@ -15420,6 +15677,9 @@ function () {
     /** @type {string} */
 
     this.title = '';
+    /** @type {Number} */
+
+    this.questionCount = 0;
   }
 
   _createClass(Quiz, null, [{
@@ -15428,6 +15688,7 @@ function () {
       var quiz = new Quiz();
       quiz.id = rawData.id;
       quiz.title = rawData.title;
+      quiz.questionCount = rawData.questionCount;
       return quiz;
     }
   }]);
@@ -15492,6 +15753,34 @@ function () {
   }]);
 
   return Answer;
+}();
+
+var Result =
+/*#__PURE__*/
+function () {
+  function Result() {
+    _classCallCheck(this, Result);
+
+    /** @type {?int} */
+    this.correctAnswerCount = 0; // this.correctQuestionList = [];
+    // this.incorrectQuestionList = [];
+
+    this.answeredQuestionList = [];
+  }
+
+  _createClass(Result, null, [{
+    key: "fromArray",
+    value: function fromArray(rawData) {
+      var result = new Result();
+      result.correctAnswerCount = rawData.correctAnswerCount; // result.correctQuestionList = rawData.correctQuestionList;
+      // result.incorrectQuestionList = rawData.incorrectQuestionList;
+
+      result.answeredQuestionList = rawData.answeredQuestionList;
+      return result;
+    }
+  }]);
+
+  return Result;
 }();
 
 

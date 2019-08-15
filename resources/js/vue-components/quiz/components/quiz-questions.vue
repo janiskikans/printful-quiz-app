@@ -4,8 +4,19 @@
             <div class="col-12">
                 <div class="card bg-secondary">
                     <div class="card-body">
+
+                        <div v-if="error.length" class="alert alert-danger">
+                            {{ error }}
+                        </div>
+
+                        <p>Question {{currentQuestionNumber}} out of {{currentQuiz.questionCount}}</p>
+                        <div class="progress mb-3">
+                            <div class="progress-bar" role="progressbar" aria-valuenow="25" aria-valuemin="0"
+                            :aria-valuemax="currentQuiz.questionCount" :style="{ width: getProgressPercentage() + '%' }"></div>
+                        </div>
+
                         <div class="pl-1">
-                            <h2 class="pb-1">{{ currentQuestion.text }}</h2>
+                            <h2 class="pb-1">{{ currentQuestionNumber}}. {{ currentQuestion.text }}</h2>
                             <p>Please select the correct answer below to continue.</p>
                         </div>
 
@@ -33,12 +44,24 @@
 
 <script>
     import axios from 'axios';
-    import {Answer} from "../models/quiz.models";
+    import {Answer, Result, Question} from "../models/quiz.models";
 
     export default {
         props: {
             /** @type {Question} */
             currentQuestion: {
+                required: true,
+            },
+
+            /** @type {Result} */
+            result: {
+                required: true,
+            },
+
+            /**
+             * @type {Quiz}
+             */
+            currentQuiz: {
                 required: true,
             },
         },
@@ -48,6 +71,8 @@
                 /** @type {?Answer} */
                 selectedAnswer: null,
                 loading: false,
+                error: '',
+                currentQuestionNumber: 1,
             }
         },
 
@@ -63,6 +88,10 @@
                 }
             },
 
+            getProgressPercentage() {
+               return ((this.currentQuestionNumber - 1) / this.currentQuiz.questionCount) * 100;
+            },
+
             getNextQuestion() {
                 if (this.isButtonDisabled) {
                     return;
@@ -76,11 +105,40 @@
                 axios.post('/quiz/next-question', data)
                     .then((response) => {
 
+                        if (response.data.error) {
+                            this.error = response.data.error;
+                            return;
+                        }
+
+                        if (response.data.resultData) {
+                            this.onResultsReceived(response.data.resultData);
+
+                            this.currentQuestionNumber = 0;
+
+                            return;
+                        }
+
+                        this.selectedAnswer = null;
+
+                        let nextQuestion = Question.fromArray(response.data.questionData);
+
+                        this.currentQuestion.id = nextQuestion.id;
+                        this.currentQuestion.text = nextQuestion.text;
+                        this.currentQuestion.answers = nextQuestion.answers;
+
+                        this.currentQuestionNumber++;
+
                     })
                     .finally(() => {
                         this.loading = false;
                 })
             },
+
+            onResultsReceived(resultData) {
+                let result = Result.fromArray(resultData);
+
+                this.$emit('results-received', result);
+            }
         },
 
         computed: {

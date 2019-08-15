@@ -4,7 +4,9 @@
 namespace Quiz\Controllers;
 
 
+use Exception;
 use Illuminate\Support\Arr;
+use Quiz\ActiveUser;
 use Quiz\Services\QuizService;
 use Quiz\Session;
 
@@ -21,6 +23,21 @@ class QuizController extends BaseController
         parent::__construct();
     }
 
+    public function quizList()
+    {
+        $quizData = [];
+
+        if (ActiveUser::isLoggedIn()) {
+            try {
+                $quizData = $this->quizService->getQuizRcpData();
+            } catch (Exception $exception) {
+                die($exception->getMessage());
+            }
+        }
+
+        return $this->view('quiz-list', ['quizData' => $quizData]);
+    }
+
     public function start()
     {
         $userId = Session::getInstance()->getLoggedInUserId();
@@ -29,6 +46,7 @@ class QuizController extends BaseController
         try {
             $this->quizService->start($userId, $quizId);
             $question = $this->quizService->getNextQuestion();
+
             $questionData = $this->quizService->getQuizQuestionRcpData($question);
         } catch (\Exception $exception) {
             return json_encode([
@@ -48,6 +66,15 @@ class QuizController extends BaseController
         try {
             $this->quizService->saveAnswer($answerId);
             $question = $this->quizService->getNextQuestion();
+
+            if (!$question) {
+                $resultData = $this->quizService->getResultData();
+
+                return json_encode([
+                    'resultData' => $resultData,
+                ]);
+            }
+
             $questionData = $this->quizService->getQuizQuestionRcpData($question);
 
         } catch (\Exception $exception) {

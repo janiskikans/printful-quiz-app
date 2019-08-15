@@ -15,4 +15,5 @@ return array(
     '/logout' => new Route(AuthController::class, 'logout'),
     '/quiz/start' => new Route(QuizController::class, 'start'),
     '/quiz/next-question' => new Route(QuizController::class, 'nextQuestion'),
+    '/quiz/list' => new Route(QuizController::class, 'quizList')
 );
