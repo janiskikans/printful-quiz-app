@@ -2,6 +2,7 @@
 /**
  * @var View $this
  * @var array $quizData
+ * @var array $attemptData
  */
 
 use Quiz\ActiveUser;
@@ -18,7 +19,7 @@ if (ActiveUser::isLoggedIn()) {
         <div class="row justify-content-center">
             <div class="col-8">
                 <?php if (ActiveUser::isLoggedIn()): ?>
-                    <quiz :name='<?= json_encode($userName); ?>' :quizzes-prop='<?= json_encode($quizData); ?>'></quiz>
+                    <quiz :attempts-prop='<?= json_encode($attemptData) ?>' :name='<?= json_encode($userName); ?>' :quizzes-prop='<?= json_encode($quizData); ?>'></quiz>
                 <?php endif; ?>
             </div>
         </div>

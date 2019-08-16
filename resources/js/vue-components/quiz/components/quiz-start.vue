@@ -1,5 +1,4 @@
 <template>
-    <div class="container" style="height:70vh;">
         <div class="row h-100 justify-content-center align-items-center">
             <div class="col-12">
                 <div class="card bg-secondary">
@@ -27,7 +26,6 @@
                 </div>
             </div>
         </div>
-    </div>
 </template>
 
 <script>

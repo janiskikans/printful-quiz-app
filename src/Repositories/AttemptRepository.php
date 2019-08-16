@@ -11,6 +11,7 @@ use Quiz\Models\AttemptModel;
  * Class AttemptRepository
  * @package Quiz\Repositories
  * @method AttemptModel create(array $data) : Model
+ * @method AttemptModel[] all($conditions = [])
  * @method AttemptModel|null one(array $conditions = []) : ?Model
  */
 class AttemptRepository extends BaseRepository
@@ -22,6 +23,15 @@ class AttemptRepository extends BaseRepository
     protected function getModelClass()
     {
         return AttemptModel::class;
+    }
+
+    public function getAttemptListByUserIdWithLimit($userId, $limit)
+    {
+        return AttemptModel::query()
+            ->where(['user_id' => $userId])
+            ->take($limit)
+            ->orderBy('quiz_taken_at', 'desc')
+            ->get();
     }
 
     public function getCompletedQuizListByUserId(int $userId) {

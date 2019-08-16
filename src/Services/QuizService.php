@@ -3,6 +3,7 @@
 
 namespace Quiz\Services;
 
+use DateTime;
 use Quiz\Exceptions\QuizException;
 use Quiz\Models\AnswerModel;
 use Quiz\Models\QuestionModel;
@@ -101,9 +102,12 @@ class QuizService
 
         $quiz = $this->getQuizById($quizId);
 
+        $currentTimestamp = new DateTime('now', new \DateTimeZone('Europe/Riga'));
+
         $attempt = $this->attemptRepository->create([
+            'quiz_taken_at' => $currentTimestamp->format('Y-m-d H:i:s'),
             'user_id' => $userId,
-            'quiz_id' => $quizId
+            'quiz_id' => $quizId,
         ]);
 
         $this->session->set(self::SESSION_KEY_CURRENT_ATTEMPT_ID, $attempt->id);
@@ -247,5 +251,27 @@ class QuizService
             throw new QuizException('Quiz has not been started!');
         }
         return $attempt;
+    }
+
+    /**
+     * @param $userId
+     * @return array|\Illuminate\Database\Eloquent\Collection|AttemptRepository[]
+     */
+    public function getAllAttemptsByUserIdRcpDataWithLimit($userId, $limit)
+    {
+        $attempts = $this->attemptRepository->getAttemptListByUserIdWithLimit($userId, $limit);
+
+        $attemptData = [];
+
+        foreach ($attempts as $attempt) {
+            $attemptData[] = [
+                'id' => $attempt->id,
+                'quizTakenAt' => date('M d, h:i', strtotime($attempt->quiz_taken_at)),
+                'userId' => $attempt->user_id,
+                'quizId' => $attempt->quiz_id
+            ];
+        }
+
+        return $attemptData;
     }
 }

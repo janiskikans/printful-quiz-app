@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * Class AttemptModel
  * @package Quiz\Models
  * @property int $id
+ * @property string $quiz_taken_at
  * @property int $user_id
  * @property int $quiz_id
  *

@@ -92,4 +92,32 @@ class Result {
     }
 }
 
-export {Quiz, Question, Answer, Result}
+class Attempt {
+
+    constructor() {
+        /** @type {?int} */
+        this.id = null;
+
+        /** @type {string} */
+        this.quizTakenAt = '';
+
+        /** @type {?int} */
+        this.userId = null;
+
+        /** @type {?int} */
+        this.quizId = null;
+    }
+
+    static fromArray(rawData) {
+        let attempt = new Attempt();
+
+        attempt.id = rawData.id;
+        attempt.quizTakenAt = rawData.quizTakenAt;
+        attempt.userId = rawData.userId;
+        attempt.quizId = rawData.quizId;
+
+        return attempt;
+    }
+}
+
+export {Quiz, Question, Answer, Result, Attempt}

@@ -1,11 +1,23 @@
 <template>
     <div>
 
-        <quiz-start v-if="currentStep === 1"
-                    :name="name"
-                    :quizzes="quizzes"
-                    @quiz-started="onQuizStarted">
-        </quiz-start>
+        <div class="container h-100 mt-5" v-if="currentStep === 1">
+            <div class="row mb-3">
+                <div class="col-12">
+                    <quiz-start :name="name"
+                                :quizzes="quizzes"
+                                @quiz-started="onQuizStarted">
+                    </quiz-start>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12">
+                    <quiz-history :attempts="attempts" :quizzes="quizzes" >
+                    </quiz-history>
+                </div>
+            </div>
+        </div>
+
 
         <quiz-questions :current-quiz="currentQuiz" :result="result" :current-question="currentQuestion" @results-received="onResultsReceived" v-else-if="currentStep === 2">
         </quiz-questions>
@@ -34,13 +46,16 @@
     import QuizStartComponent from './quiz-start.vue';
     import QuizQuestionsComponent from './quiz-questions.vue';
     import QuizResultsComponent from './quiz-results.vue';
+    import QuizHistoryComponent from './quiz-history.vue';
     import {Quiz} from './../models/quiz.models.js';
+    import {Attempt} from "../models/quiz.models";
 
     export default {
         components: {
             'quiz-start': QuizStartComponent,
             'quiz-questions': QuizQuestionsComponent,
             'quiz-results': QuizResultsComponent,
+            'quiz-history': QuizHistoryComponent
         },
 
         props: {
@@ -51,19 +66,31 @@
             quizzesProp: {
                 default: [],
                 required: true,
-            }
+            },
+
+            attemptsProp: {
+                default: [],
+                required: true,
+            },
         },
 
         created() {
             this.quizzes = this.quizzesProp.map((quizDatum) => {
                 return Quiz.fromArray(quizDatum);
-            })
+            });
+
+            this.attempts = this.attemptsProp.map((attemptDatum) => {
+                return Attempt.fromArray(attemptDatum);
+            });
         },
 
         data() {
             return {
                 /** @type {Array<Quiz>} */
                 quizzes: [],
+
+                /** @type {Array<Attempt>} */
+                attempts: [],
 
                 /** @type {Number} **/
                 currentStep: 1,

@@ -12,13 +12,14 @@ $capsule = new Capsule;
 
 // Helper functions.
 require_once 'functions.php';
+require_once 'config.php';
 
 $capsule->addConnection([
     'driver' => 'mysql',
-    'host' => 'localhost',
-    'database' => 'quizzes',
-    'username' => 'homestead',
-    'password' => 'secret',
+    'host' => DB_HOST,
+    'database' => DB_DATABASE,
+    'username' => DB_USERNAME,
+    'password' => DB_PASSWORD,
     'charset' => 'utf8',
     'collation' => 'utf8_unicode_ci',
     'prefix' => '',
