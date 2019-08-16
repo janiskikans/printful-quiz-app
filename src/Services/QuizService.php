@@ -266,7 +266,7 @@ class QuizService
         foreach ($attempts as $attempt) {
             $attemptData[] = [
                 'id' => $attempt->id,
-                'quizTakenAt' => date('M d, h:i', strtotime($attempt->quiz_taken_at)),
+                'quizTakenAt' => date('M d, H:i', strtotime($attempt->quiz_taken_at)),
                 'userId' => $attempt->user_id,
                 'quizId' => $attempt->quiz_id
             ];
