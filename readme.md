@@ -7,30 +7,31 @@
 2. Sagatavot MySQL datu bāzi importējot mapē **sql_dump** atrodamo failu **quizzes.sql**.
 
 3. Pēc datu bāzes importēšanas, jāizveido mapē **src** konfigurācijas fails ar **config.php**, kas satur sekojošu informāciju. Konfigurācijas failā norādītie dati nemainīsies, ja tiks importēts pievienotais **quizzes.sql** fails. Ja datu bāzes credentials tiek mainīti, tad jāizmaina arī **config.php**  failā atrodamā datu bāzes konfigurācija.
-    ```$php
-    <?php
-    
-    // DB Config
-    define('DB_DRIVER', 'mysql');
-    define('DB_HOST', 'localhost');
-    define('DB_DATABASE', 'quizzes');
-    define('DB_USERNAME', 'homestead');
-    define('DB_PASSWORD', 'secret');
-    define('DB_CHARSET', 'utf8');
-    define('DB_COLLATION', 'utf8_unicode_ci');
-    define('DB_PREFIX', '');
-    ```
+   
+   ```
+   <?php
+       
+       // DB Config
+       define('DB_DRIVER', 'mysql');
+       define('DB_HOST', 'localhost');
+       define('DB_DATABASE', 'quizzes');
+       define('DB_USERNAME', 'homestead');
+       define('DB_PASSWORD', 'secret');
+       define('DB_CHARSET', 'utf8');
+       define('DB_COLLATION', 'utf8_unicode_ci');
+       define('DB_PREFIX', '');
+   ```
    
   4. Tālāk ir nepieciešams veikt nepieciešamo **Composer** dependency instalēšanu palaižot projekta root mapē komandu
     
-    ```cmd
+        ```
         composer install
-    ```
-   
+        ```
+
   5. Kā arī jāveic nepieciešamo **npm** moduļu iegušana palaižot projekta root mapē komandu
   
-    ```cmd
-        npm install
-    ```
+      ```
+      npm install
+      ```
    
-  6. Palaid serveri un done!
+  6. Atliek palaist tikai serveri un done!
