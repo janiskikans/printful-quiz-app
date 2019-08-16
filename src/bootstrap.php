@@ -15,14 +15,14 @@ require_once 'functions.php';
 require_once 'config.php';
 
 $capsule->addConnection([
-    'driver' => 'mysql',
+    'driver' => DB_DRIVER,
     'host' => DB_HOST,
     'database' => DB_DATABASE,
     'username' => DB_USERNAME,
     'password' => DB_PASSWORD,
-    'charset' => 'utf8',
-    'collation' => 'utf8_unicode_ci',
-    'prefix' => '',
+    'charset' => DB_CHARSET,
+    'collation' => DB_COLLATION,
+    'prefix' => DB_PREFIX,
 ]);
 
 $capsule->setAsGlobal();
