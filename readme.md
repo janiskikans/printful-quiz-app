@@ -1,4 +1,4 @@
-## Quiz Aplikācijas sagatavošana
+## Quiz aplikācijas sagatavošana
 
 1. Lejupielādēt printful-quiz-app repositoriju uz servera izmantojot kodu:
     ```cmd
@@ -35,3 +35,9 @@
       ```
    
   6. Atliek palaist tikai serveri un done!
+  
+  ### Zināmās problēmas :bug:
+ 
+  1. **Quiz History saraksta atjaunināšanās**
+        * **Problēma:** _quiz-history.vue_ komponentē uzreiz pēc kārtējā quiz izpildes **neatjaunojas** izpildīto quiz vēsture. 
+        * **Šī brīža risinājums:** Lai saraksts atjaunotos ir **nepieciešams atjaunināt lapu**.
