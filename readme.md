@@ -6,7 +6,7 @@
     ```
 2. Sagatavot MySQL datu bāzi importējot mapē **sql_dump** atrodamo failu **quizzes.sql**.
 
-3. Pēc datu bāzes importēšanas, jāizveido mapē **src** konfigurācijas fails ar **config.php**, kas satur sekojošu informāciju. Konfigurācijas failā norādītie dati nemainīsies, ja tiks importēts pievienotais **quizzes.sql** fails. 
+3. Pēc datu bāzes importēšanas, jāizveido mapē **src** konfigurācijas fails ar **config.php**, kas satur sekojošu informāciju. Konfigurācijas failā norādītie dati nemainīsies, ja tiks importēts pievienotais **quizzes.sql** fails. Ja datu bāzes credentials tiek mainīti, tad jāizmaina arī **config.php**  failā atrodamā datu bāzes konfigurācija.
     ```$php
     <?php
     
