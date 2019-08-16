@@ -2004,6 +2004,16 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   props: {
     attempts: {
@@ -2984,32 +2994,37 @@ var render = function() {
   var _c = _vm._self._c || _h
   return _c("div", [
     _c("div", { staticClass: "card bg-secondary" }, [
-      _c(
-        "div",
-        { staticClass: "card-body" },
-        [
-          _vm._m(0),
-          _vm._v(" "),
-          _c("p", [
-            _vm._v("Underneath you can see you latest completed quizzes.")
-          ]),
-          _vm._v(" "),
-          _vm._l(_vm.attempts, function(attempt) {
-            return _c("div", { key: _vm.key, staticClass: "card mb-3" }, [
-              _c("div", { staticClass: "card-header bg-secondary" }, [
-                _vm._v(
-                  "\n                    " +
-                    _vm._s(_vm.getQuizTitle(attempt.quizId))
-                ),
-                _c("span", { staticClass: "float-right text-primary" }, [
-                  _vm._v(_vm._s(attempt.quizTakenAt))
-                ])
-              ])
-            ])
-          })
-        ],
-        2
-      )
+      _c("div", { staticClass: "card-body" }, [
+        _vm._m(0),
+        _vm._v(" "),
+        _c("p", [
+          _vm._v("Underneath you can see you latest completed quizzes.")
+        ]),
+        _vm._v(" "),
+        _vm.attempts.length > 0
+          ? _c(
+              "div",
+              _vm._l(_vm.attempts, function(attempt) {
+                return _vm.attempts.length > 0
+                  ? _c("div", { key: _vm.key, staticClass: "card mb-3" }, [
+                      _c("div", { staticClass: "card-header bg-secondary" }, [
+                        _vm._v(
+                          "\n                        " +
+                            _vm._s(_vm.getQuizTitle(attempt.quizId))
+                        ),
+                        _c(
+                          "span",
+                          { staticClass: "float-right text-primary" },
+                          [_vm._v(_vm._s(attempt.quizTakenAt))]
+                        )
+                      ])
+                    ])
+                  : _vm._e()
+              }),
+              0
+            )
+          : _c("div", [_vm._m(1)])
+      ])
     ])
   ])
 }
@@ -3021,6 +3036,17 @@ var staticRenderFns = [
     return _c("h4", { staticClass: "mb-3" }, [
       _c("i", { staticClass: "fa fa-history" }),
       _vm._v(" Your Quiz History")
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "card mb-3" }, [
+      _c("div", { staticClass: "card-header bg-secondary" }, [
+        _c("strong", [_vm._v("You have no completed quizzes yet")]),
+        _vm._v(". Try starting a new quiz.\n                    ")
+      ])
     ])
   }
 ]

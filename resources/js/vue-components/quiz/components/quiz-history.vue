@@ -8,11 +8,21 @@
 
                 <p>Underneath you can see you latest completed quizzes.</p>
 
-                <div class="card mb-3" v-for="attempt in attempts" :key="key">
-                    <div class="card-header bg-secondary">
-                        {{ getQuizTitle(attempt.quizId) }}<span class="float-right text-primary">{{ attempt.quizTakenAt }}</span>
+                <div v-if="attempts.length > 0">
+                    <div class="card mb-3" v-for="attempt in attempts" :key="key" v-if="attempts.length > 0">
+                        <div class="card-header bg-secondary">
+                            {{ getQuizTitle(attempt.quizId) }}<span class="float-right text-primary">{{ attempt.quizTakenAt }}</span>
+                        </div>
                     </div>
                 </div>
+                <div v-else>
+                    <div class="card mb-3">
+                        <div class="card-header bg-secondary">
+                           <strong>You have no completed quizzes yet</strong>. Try starting a new quiz.
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </div>
 

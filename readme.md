@@ -21,4 +21,16 @@
     define('DB_PREFIX', '');
     ```
    
-  4. Done!
+  4. Tālāk ir nepieciešams veikt nepieciešamo **Composer** dependency instalēšanu palaižot projekta root mapē komandu
+    
+    ```cmd
+        composer install
+    ```
+   
+  5. Kā arī jāveic nepieciešamo **npm** moduļu iegušana palaižot projekta root mapē komandu
+  
+    ```cmd
+        npm install
+    ```
+   
+  6. Palaid serveri un done!

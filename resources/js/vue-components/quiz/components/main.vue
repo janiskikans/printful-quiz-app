@@ -12,7 +12,7 @@
             </div>
             <div class="row">
                 <div class="col-12">
-                    <quiz-history :attempts="attempts" :quizzes="quizzes" >
+                    <quiz-history :attempts="attempts" :quizzes="quizzes">
                     </quiz-history>
                 </div>
             </div>
@@ -55,7 +55,7 @@
             'quiz-start': QuizStartComponent,
             'quiz-questions': QuizQuestionsComponent,
             'quiz-results': QuizResultsComponent,
-            'quiz-history': QuizHistoryComponent
+            'quiz-history': QuizHistoryComponent,
         },
 
         props: {
