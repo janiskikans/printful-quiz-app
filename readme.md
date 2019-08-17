@@ -36,13 +36,13 @@
    
   6. Atliek palaist tikai serveri un done!
   
-  ### Zināmās problēmas :bug:
+  ## Zināmās problēmas :bug:
  
   1. **Quiz History saraksta atjaunināšanās**
         * **Problēma:** _quiz-history.vue_ komponentē uzreiz pēc kārtējā quiz izpildes **neatjaunojas** izpildīto quiz vēsture. 
         * **Šī brīža risinājums:** Lai saraksts atjaunotos ir **nepieciešams atjaunināt lapu**.
         
-  ### Izmantotie risinājumi
+  ## Izmantotie risinājumi
   
   * [Vue.js](https://vuejs.org/)
   * [Laravel Eloquent](https://laravel.com/docs/5.8/eloquent)
