@@ -6,7 +6,7 @@
     ```
 2. Sagatavot MySQL datu bāzi importējot mapē **sql_dump** atrodamo failu **quizzes.sql**.
 
-3. Pēc datu bāzes importēšanas, jāizveido mapē **src** konfigurācijas fails ar **config.php**, kas satur sekojošu informāciju. Konfigurācijas failā norādītie dati nemainīsies, ja tiks importēts pievienotais **quizzes.sql** fails. Ja datu bāzes credentials tiek mainīti, tad jāizmaina arī **config.php**  failā atrodamā datu bāzes konfigurācija.
+3. Pēc datu bāzes importēšanas, jāizveido mapē **src** konfigurācijas fails ar nosaukumu **config.php**, kas satur zemāk redzamo informāciju, jeb PHP koda fragmentu. Ja datu bāzes tabulas tiks izveidotas izmantojot pievienoto **quizzes.sql** failu, tad jāmaina tikai **DB_USERNAME** un **DB_PASSWORD** parametri atbilstoši Jūsu MySQL uzstādījumiem. Ja datu bāzes tabulas tiek veidotas savādāk, tad atbilstoši jāizmaina arī **config.php**  failā atrodamie datu bāzes pārējie parametri.
    
    ```
    <?php
@@ -41,3 +41,10 @@
   1. **Quiz History saraksta atjaunināšanās**
         * **Problēma:** _quiz-history.vue_ komponentē uzreiz pēc kārtējā quiz izpildes **neatjaunojas** izpildīto quiz vēsture. 
         * **Šī brīža risinājums:** Lai saraksts atjaunotos ir **nepieciešams atjaunināt lapu**.
+        
+  ### Izmantotie risinājumi
+  
+  * [Vue.js](https://vuejs.org/)
+  * [Laravel Eloquent](https://laravel.com/docs/5.8/eloquent)
+  * [Bootswatch Simplex](https://bootswatch.com/simplex/)
+  * u.c.
