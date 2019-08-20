@@ -4,8 +4,13 @@
 namespace Quiz\Services;
 
 use DateTime;
+use Exception;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model;
 use Quiz\Exceptions\QuizException;
 use Quiz\Models\AnswerModel;
+use Quiz\Models\AttemptModel;
 use Quiz\Models\QuestionModel;
 use Quiz\Models\QuizModel;
 use Quiz\Repositories\AnswerRepository;
@@ -23,6 +28,9 @@ class QuizService
 
     /** @var string */
     private const SESSION_KEY_QUESTIONS_ANSWERED = 'questionsAnswered';
+
+    /** @var string */
+    const QUIZ_TAKEN_AT_DATE_FORMAT = 'M d, H:i';
 
     /** @var QuizRepository $repository */
     private $repository;
@@ -90,7 +98,7 @@ class QuizService
      * @param int $userId
      * @param int $quizId
      * @return QuizModel
-     * @throws \Exception
+     * @throws Exception
      */
     public function start(int $userId, int $quizId)
     {
@@ -148,8 +156,8 @@ class QuizService
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Model|object|QuestionModel|null
-     * @throws \Exception
+     * @return Builder|Model|object|QuestionModel|null
+     * @throws Exception
      */
     public function getNextQuestion()
     {
@@ -171,7 +179,7 @@ class QuizService
     /**
      * @param int $quizId
      * @return QuizModel
-     * @throws \Exception
+     * @throws Exception
      */
     public function getQuizById(int $quizId): QuizModel
     {
@@ -208,7 +216,7 @@ class QuizService
 
     /**
      * @return array
-     * @throws \Exception
+     * @throws Exception
      */
     public function getResultData()
     {
@@ -240,8 +248,8 @@ class QuizService
 
     /**
      * @param $attemptId
-     * @return \Quiz\Models\AttemptModel|null
-     * @throws \Exception
+     * @return AttemptModel|null
+     * @throws Exception
      */
     public function getAttemptById($attemptId)
     {
@@ -255,7 +263,8 @@ class QuizService
 
     /**
      * @param $userId
-     * @return array|\Illuminate\Database\Eloquent\Collection|AttemptRepository[]
+     * @param $limit
+     * @return array|Collection|AttemptRepository[]
      */
     public function getAllAttemptsByUserIdRcpDataWithLimit($userId, $limit)
     {
@@ -266,7 +275,7 @@ class QuizService
         foreach ($attempts as $attempt) {
             $attemptData[] = [
                 'id' => $attempt->id,
-                'quizTakenAt' => date('M d, H:i', strtotime($attempt->quiz_taken_at)),
+                'quizTakenAt' => date(self::QUIZ_TAKEN_AT_DATE_FORMAT, strtotime($attempt->quiz_taken_at)),
                 'userId' => $attempt->user_id,
                 'quizId' => $attempt->quiz_id
             ];
