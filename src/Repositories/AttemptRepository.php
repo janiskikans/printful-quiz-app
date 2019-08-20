@@ -4,7 +4,8 @@
 namespace Quiz\Repositories;
 
 
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Quiz\Models\AttemptModel;
 
 /**
@@ -25,6 +26,11 @@ class AttemptRepository extends BaseRepository
         return AttemptModel::class;
     }
 
+    /**
+     * @param $userId
+     * @param $limit
+     * @return Builder[]|Collection|\Illuminate\Database\Query\Builder[]|\Illuminate\Support\Collection
+     */
     public function getAttemptListByUserIdWithLimit($userId, $limit)
     {
         return AttemptModel::query()
@@ -34,6 +40,10 @@ class AttemptRepository extends BaseRepository
             ->get();
     }
 
+    /**
+     * @param int $userId
+     * @return Builder[]|Collection|\Illuminate\Database\Query\Builder[]|\Illuminate\Support\Collection
+     */
     public function getCompletedQuizListByUserId(int $userId) {
         return AttemptModel::query()
             ->select('attempt_id', 'user_id', 'quiz_id', 'is_correct')

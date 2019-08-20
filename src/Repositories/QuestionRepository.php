@@ -4,6 +4,8 @@
 namespace Quiz\Repositories;
 
 
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Quiz\Models\QuestionModel;
 
 class QuestionRepository extends BaseRepository
@@ -20,7 +22,7 @@ class QuestionRepository extends BaseRepository
     /**
      * @param int $quizId
      * @param int $offset
-     * @return \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Model|object|QuestionModel|null
+     * @return Builder|Model|object|QuestionModel|null
      */
     public function getQuestionByQuizIdAndOffset(int $quizId, int $offset)
     {

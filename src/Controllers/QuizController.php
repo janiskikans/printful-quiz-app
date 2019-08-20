@@ -41,6 +41,7 @@ class QuizController extends BaseController
     public function start()
     {
         $userId = Session::getInstance()->getLoggedInUserId();
+
         $quizId = Arr::get($_POST, 'quizId');
 
         try {
@@ -50,7 +51,7 @@ class QuizController extends BaseController
             $questionData = $this->quizService->getQuizQuestionRcpData($question);
         } catch (\Exception $exception) {
             return json_encode([
-              'error' => $exception->getMessage(),
+                'error' => $exception->getMessage(),
             ]);
         }
 
@@ -67,7 +68,7 @@ class QuizController extends BaseController
             $this->quizService->saveAnswer($answerId);
             $question = $this->quizService->getNextQuestion();
 
-            if (!$question) {
+            if ( ! $question) {
                 $resultData = $this->quizService->getResultData();
 
                 return json_encode([

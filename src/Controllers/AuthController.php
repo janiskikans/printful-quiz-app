@@ -16,6 +16,9 @@ class AuthController extends BaseController
         'name' => 'required'
     ];
 
+    /**
+     * @return string
+     */
     public function register()
     {
         return $this->view('register');
@@ -26,12 +29,12 @@ class AuthController extends BaseController
         $data = $this->input;
 
         if ($data['password'] !== $data['password_confirmation']) {
-            Session::getInstance()->addError('Passwords do not match!');
+            $this->addErrorToInstance('Passwords do not match!');
             redirect('/register');
         }
 
         if (strlen($data['password']) < 8) {
-            Session::getInstance()->addError('Password must be at least 8 characters long! Please try making it longer.');
+            $this->addErrorToInstance('Password must be at least 8 characters long! Please try making it longer.');
             redirect('/register');
         }
 
@@ -40,7 +43,7 @@ class AuthController extends BaseController
         try {
             $userService->registerUser($data);
         } catch (Exception $exception) {
-            Session::getInstance()->addError($exception->getMessage());
+            $this->addErrorToInstance($exception->getMessage());
             redirect('/register');
         }
 
@@ -56,14 +59,16 @@ class AuthController extends BaseController
 
         try {
             $userService->attemptLogin($data);
-//            Session::getInstance()->addMessage('Login successful!');
             redirect();
         } catch (Exception $exception) {
-            Session::getInstance()->addError($exception->getMessage());
+            $this->addErrorToInstance($exception->getMessage());
             redirect('/login');
         }
     }
 
+    /**
+     * @return string
+     */
     public function login()
     {
         return $this->view('login');
@@ -73,5 +78,13 @@ class AuthController extends BaseController
     {
         Session::getInstance()->delete(Session::LOGGED_IN_USER);
         redirect();
+    }
+
+    /**
+     * @param string $message
+     */
+    public function addErrorToInstance(string $message): void
+    {
+        Session::getInstance()->addError($message);
     }
 }

@@ -7,9 +7,11 @@ namespace Quiz\Controllers;
 class NotFoundController extends BaseController
 {
 
+    /**
+     * @return string
+     */
     public function index()
     {
-//        echo 'Route not found';
         return $this->view('404page');
     }
 }
