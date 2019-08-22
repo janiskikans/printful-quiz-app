@@ -89,4 +89,9 @@ class QuizController extends BaseController
         ]);
 
     }
+
+    public function quizCreate()
+    {
+        return $this->view('quiz-create');
+    }
 }

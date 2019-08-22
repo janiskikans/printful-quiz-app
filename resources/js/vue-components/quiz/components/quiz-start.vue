@@ -20,8 +20,12 @@
                             </option>
                         </select>
 
-                        <button @click="startQuiz" :disabled="!canStartQuiz" class="btn btn-primary mt-3">Start Quiz
-                        </button>
+                        <div class="mt-3">
+                            <button @click="startQuiz" :disabled="!canStartQuiz" class="btn btn-primary mr-1">Start Quiz
+                            </button>
+                            <a href="/quiz-create" class="btn btn-outline-primary">Create a Quiz</a>
+                        </div>
+
                     </div>
                 </div>
             </div>
