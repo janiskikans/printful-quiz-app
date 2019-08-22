@@ -94,4 +94,21 @@ class QuizController extends BaseController
     {
         return $this->view('quiz-create');
     }
+
+    public function quizCreationStart()
+    {
+        $quizTitle = Arr::get($_POST, 'quizTitle');
+
+        try {
+            $newQuizId = $this->quizService->saveNewQuiz($quizTitle);
+        } catch (\Exception $exception) {
+            return json_encode([
+                'error' => $exception->getMessage(),
+            ]);
+        }
+
+        return json_encode([
+            'newQuizId' => $newQuizId,
+        ]);
+    }
 }

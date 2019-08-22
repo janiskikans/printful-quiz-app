@@ -2,7 +2,7 @@
     <div>
 
         <div v-if="currentStep === 1">
-            <quiz-create-title></quiz-create-title>
+            <quiz-create-title @quiz-creation-started="onQuizCreationStarted"></quiz-create-title>
         </div>
 
         <div v-else class="container" style="height:70vh;">
@@ -30,7 +30,23 @@
             return {
                 /** @type {Number} **/
                 currentStep: 1,
+
+                /** @type {Number} **/
+                newQuizId: null,
             }
-        }
+        },
+
+        methods: {
+            /**
+             * @param {{newQuizId: number}} emittedData
+             */
+            onQuizCreationStarted(emittedData) {
+                this.newQuizId = emittedData.newQuizId;
+
+                console.log("New Quiz Id" + this.newQuizId);
+
+                this.currentStep++;
+            }
+        },
     }
 </script>

@@ -17,6 +17,9 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class QuizModel extends BaseModel
 {
 
+    /** @var array */
+    protected $guarded = [];
+
     /**
      * @var string $table
      */

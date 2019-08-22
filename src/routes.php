@@ -15,5 +15,6 @@ return array(
     '/logout' => new Route(AuthController::class, 'logout'),
     '/quiz/start' => new Route(QuizController::class, 'start'),
     '/quiz/next-question' => new Route(QuizController::class, 'nextQuestion'),
-    '/quiz-create' => new Route(QuizController::class, 'quizCreate')
+    '/quiz-create' => new Route(QuizController::class, 'quizCreate'),
+    '/quiz-create/start' => new Route(QuizController::class, 'quizCreationStart'),
 );

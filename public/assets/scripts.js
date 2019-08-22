@@ -1867,8 +1867,21 @@ __webpack_require__.r(__webpack_exports__);
   data: function data() {
     return {
       /** @type {Number} **/
-      currentStep: 1
+      currentStep: 1,
+
+      /** @type {Number} **/
+      newQuizId: null
     };
+  },
+  methods: {
+    /**
+     * @param {{newQuizId: number}} emittedData
+     */
+    onQuizCreationStarted: function onQuizCreationStarted(emittedData) {
+      this.newQuizId = emittedData.newQuizId;
+      console.log("New Quiz Id" + this.newQuizId);
+      this.currentStep++;
+    }
   }
 });
 
@@ -1883,13 +1896,81 @@ __webpack_require__.r(__webpack_exports__);
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
+/* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! axios */ "./node_modules/axios/index.js");
+/* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(axios__WEBPACK_IMPORTED_MODULE_0__);
 //
 //
 //
 //
 //
 //
-/* harmony default export */ __webpack_exports__["default"] = ({});
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+/* harmony default export */ __webpack_exports__["default"] = ({
+  data: function data() {
+    return {
+      quizTitleInputValue: '',
+      error: '',
+      loading: false
+    };
+  },
+  methods: {
+    startQuizCreation: function startQuizCreation() {
+      var _this = this;
+
+      this.error = '';
+
+      if (!this.canStartQuizCreation) {
+        return;
+      }
+
+      var data = new FormData();
+      data.append('quizTitle', this.quizTitleInputValue);
+      this.loading = true;
+      axios__WEBPACK_IMPORTED_MODULE_0___default.a.post('/quiz-create/start', data).then(function (response) {
+        if (response.data.error) {
+          _this.error = response.data.error;
+          return;
+        }
+
+        _this.$emit('quiz-creation-started', {
+          'newQuizTitle': _this.quizTitleInputValue,
+          'newQuizId': response.data.newQuizId
+        });
+      })["finally"](function () {
+        _this.loading = false;
+      });
+    }
+  },
+  computed: {
+    canStartQuizCreation: function canStartQuizCreation() {
+      return this.quizTitleInputValue.length > 0;
+    }
+  }
+});
 
 /***/ }),
 
@@ -2953,7 +3034,15 @@ var render = function() {
   var _c = _vm._self._c || _h
   return _c("div", [
     _vm.currentStep === 1
-      ? _c("div", [_c("quiz-create-title")], 1)
+      ? _c(
+          "div",
+          [
+            _c("quiz-create-title", {
+              on: { "quiz-creation-started": _vm.onQuizCreationStarted }
+            })
+          ],
+          1
+        )
       : _c(
           "div",
           { staticClass: "container", staticStyle: { height: "70vh" } },
@@ -3011,14 +3100,96 @@ var render = function() {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _vm._m(0)
+  return _c(
+    "div",
+    { staticClass: "row h-100 justify-content-center align-items-center" },
+    [
+      _c("div", { staticClass: "col-12" }, [
+        _c("div", { staticClass: "card bg-secondary" }, [
+          _c("div", { staticClass: "card-body" }, [
+            _vm.error.length
+              ? _c("div", { staticClass: "alert alert-danger" }, [
+                  _vm._v(
+                    "\n                    " +
+                      _vm._s(_vm.error) +
+                      "\n                "
+                  )
+                ])
+              : _vm._e(),
+            _vm._v(" "),
+            _vm._m(0),
+            _vm._v(" "),
+            _c(
+              "form",
+              {
+                attrs: { action: "/quiz-create/quizTitlePost", method: "POST" }
+              },
+              [
+                _c("div", { staticClass: "form-group" }, [
+                  _c("label", { attrs: { for: "quizTitleInput" } }, [
+                    _vm._v("Quiz Title")
+                  ]),
+                  _vm._v(" "),
+                  _c("input", {
+                    directives: [
+                      {
+                        name: "model",
+                        rawName: "v-model",
+                        value: _vm.quizTitleInputValue,
+                        expression: "quizTitleInputValue"
+                      }
+                    ],
+                    staticClass: "form-control",
+                    attrs: {
+                      required: "",
+                      id: "quizTitleInput",
+                      type: "text",
+                      name: "quizTitle",
+                      placeholder: "Quiz Title"
+                    },
+                    domProps: { value: _vm.quizTitleInputValue },
+                    on: {
+                      input: function($event) {
+                        if ($event.target.composing) {
+                          return
+                        }
+                        _vm.quizTitleInputValue = $event.target.value
+                      }
+                    }
+                  })
+                ])
+              ]
+            ),
+            _vm._v(" "),
+            _c(
+              "button",
+              {
+                staticClass: "btn btn-primary",
+                attrs: { type: "submit", disabled: !_vm.canStartQuizCreation },
+                on: { click: _vm.startQuizCreation }
+              },
+              [_vm._v("Submit")]
+            )
+          ])
+        ])
+      ])
+    ]
+  )
 }
 var staticRenderFns = [
   function() {
     var _vm = this
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
-    return _c("div", [_c("h1", [_vm._v("quiz-create-title-component")])])
+    return _c("div", [
+      _c("h1", { staticClass: "pb-1" }, [_vm._v("Create a New Quiz")]),
+      _vm._v(" "),
+      _c("p", [
+        _vm._v(
+          "Please enter your quiz title below. When finished continue to the next step."
+        )
+      ])
+    ])
   }
 ]
 render._withStripped = true

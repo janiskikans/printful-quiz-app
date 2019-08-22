@@ -179,7 +179,7 @@ class QuizService
     /**
      * @param int $quizId
      * @return QuizModel
-     * @throws Exception
+     * @throws QuizException
      */
     public function getQuizById(int $quizId): QuizModel
     {
@@ -188,6 +188,23 @@ class QuizService
         if ( ! $quiz) {
             throw new QuizException("Could not find quiz with id #$quizId");
         }
+
+        return $quiz;
+    }
+
+    /**
+     * @param string $quizTitle
+     * @return QuizModel
+     * @throws QuizException
+     */
+    public function getQuizByTitle(string $quizTitle): QuizModel
+    {
+        $quiz = $this->repository->one(['title' => $quizTitle]);
+
+        if (!$quiz) {
+            throw new QuizException("Could not find quiz with title $quizTitle");
+        }
+
         return $quiz;
     }
 
@@ -282,5 +299,22 @@ class QuizService
         }
 
         return $attemptData;
+    }
+
+    public function saveNewQuiz($quizTitle)
+    {
+        $quizExists = $this->repository->exists(['title' => $quizTitle]);
+
+        if ($quizExists) {
+            throw new QuizException('Quiz with this title already exists! Please choose a different title.');
+        }
+
+        $newQuiz = $this->repository->create([
+            'title' => $quizTitle,
+        ]);
+
+        $newQuizId = $this->getQuizByTitle($quizTitle);
+
+        return $newQuizId;
     }
 }
