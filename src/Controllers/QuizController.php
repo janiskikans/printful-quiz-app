@@ -109,6 +109,7 @@ class QuizController extends BaseController
 
         return json_encode([
             'newQuizId' => $newQuizId,
+            'newQuizTitle' => $quizTitle,
         ]);
     }
 }
