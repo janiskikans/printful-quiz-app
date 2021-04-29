@@ -1,7 +1,7 @@
 {
     "name": "vagrant/quiz",
     "require": {
-        "illuminate/database": "^5.8",
+        "illuminate/database": "^6.20",
       "ext-pdo": "*",
       "ext-json": "*"
     },
